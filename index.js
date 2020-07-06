@@ -39,7 +39,6 @@ client.on("message", message => {
                 .setColor('#9d4d27')
                 .setTitle("Help")
                 .setAuthor('FM Security', "https://media.discordapp.net/attachments/680182797339590659/729615114164240384/Factorio_Mods.png?width=677&height=677")
-                .setThumbnail(message.author.displayAvatarURL())
                 .addFields(
                     { name: '$myinfo', value: "Lists information about the person that called it" },
                     { name: '$help', value: "This command" },
