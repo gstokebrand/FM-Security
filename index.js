@@ -3,7 +3,7 @@ const pm = require('pretty-ms');
 const client = new Discord.Client();
 const botConfig = require("./botConfig.json");
 
-const modrole = "724367711282659438";
+const modrole = "674324415558975509";
 var enabled = true;
 
 client.on("ready", () => {
@@ -12,6 +12,7 @@ client.on("ready", () => {
 
 client.on("message", message => {
     if (message.content.startsWith(botConfig.prefix)) {
+        console.log(message.author.tag + " called " + message.content + " @ " + message.createdAt)
         var cmd = message.content.substr(1)
         if (cmd.startsWith("myinfo")){
             let infochannel = message.channel
@@ -32,7 +33,6 @@ client.on("message", message => {
             infochannel.send(embed)
         }
         if (message.member._roles.includes(modrole)) {
-            console.log(message.author.tag + " called " + message.content + " @ " + message.createdAt)
             if (cmd == "toggle"){
                 enabled = ! enabled;
                 message.reply("joininfo is now: " + enabled)
