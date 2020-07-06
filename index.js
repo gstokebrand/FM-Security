@@ -40,8 +40,8 @@ client.on("message", message => {
                 .setTitle("Help")
                 .setAuthor('FM Security', "https://media.discordapp.net/attachments/680182797339590659/729615114164240384/Factorio_Mods.png?width=677&height=677")
                 .addFields(
-                    { name: '$myinfo', value: "Lists information about the person that called it" },
-                    { name: '$help', value: "This command" },
+                    { name: '%myinfo', value: "Lists information about the person that called it" },
+                    { name: '%help', value: "This command" },
                 )
                 .setTimestamp()
                 .setFooter('Automated message from FM Security');
