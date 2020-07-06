@@ -44,7 +44,7 @@ client.on("message", message => {
 client.on("guildMemberAdd", member => {
     console.log(member.user.tag + " just joined the server @ " + member.joinedAt)
     if (enabled == true) {
-        const infochannel = member.guild.channels.cache.find(ch => ch.name === 's');
+        const infochannel = member.guild.channels.cache.find(ch => ch.name === 'account-checking-channel');
         let now = Date.now();
         let createdAt = member.user.createdTimestamp;
         let age = now - createdAt;
