@@ -1,9 +1,9 @@
 const Discord = require('discord.js');
 const pm = require('pretty-ms');
-const client = new Discord.Client();
 const botConfig = require("./botConfig.json");
+const client = new Discord.Client();
 
-const modrole = "674324415558975509";
+const modrole = botConfig.togglerole;
 var enabled = true;
 
 client.on("ready", () => {
