@@ -4,11 +4,14 @@ const botConfig = require("./botConfig.json");
 const client = new Discord.Client();
 
 const modrole = botConfig.togglerole;
-const messagechannel = botConfig.channel
+const messagechannel = botConfig.channel;
+const kickchannel = botConfig.kickchannel;
+var kicktime = botConfig.defaultkicktime;
 var enabled = true;
 
 client.on("ready", () => {
     console.log(`Logged in as ${client.user.tag}!`)
+    
 });
 
 client.on("message", message => {
@@ -52,6 +55,9 @@ client.on("message", message => {
                 enabled = ! enabled;
                 message.reply("joininfo is now: " + enabled)
             }
+            if (cmd =="kicktime") {
+                message.reply(`This command is not yet available. Kicktime = ${kicktime}`)
+            }
         }
     }
 });
@@ -77,6 +83,14 @@ client.on("guildMemberAdd", member => {
         infochannel.send(embed)
     } else {
         console.log("Member joined but info is disabled.")
+    }
+    if (Date.now() - member.user.createdAt < 1000*60*60*24*kicktime) {
+        const kickmsgchannel = member.guild.channels.cache.find(ch => ch.name === kickchannel);
+        const infochannel = member.guild.channels.cache.find(ch => ch.name === messagechannel);
+        let age = Date.now() - member.user.createdTimestamp;
+        member.user.send(`You have been kicked from ${message.member.guild.name}. Reason: Account too young. (${pm(age, { verbose: true })}). If you are a legitimate user come back when your account is at least ${kicktime} day(s) old.`);
+        kickmsgchannel.send(`.kick ${member} Account not older than ${kicktime} day(s) (${pm(age, { verbose: true })})`);
+        infochannel.send(`Kicked ${member} for account age violation (${pm(age, { verbose: true })})`)
     }
 });
 
