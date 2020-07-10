@@ -10,6 +10,18 @@ var kicktime = botConfig.defaultkicktime;
 var infoenabled = true;
 var kickenabled = true;
 
+// if (Date.now() - member.user.createdAt < 1000 * 60 * 60 * 24 * kicktime && kickenabled == true) {
+//     const kickmsgchannel = member.guild.channels.cache.find(ch => ch.name === kickchannel);
+//     const infochannel = member.guild.channels.cache.find(ch => ch.name === messagechannel);
+//     let age = Date.now() - member.user.createdTimestamp;
+//     member.user.send(`You have been kicked from ${message.member.guild.name}. Reason: Account too young. (${pm(age, { verbose: true })}). If you are a legitimate user come back when your account is at least ${kicktime} day(s) old.`);
+//     kickmsgchannel.send(`.kick ${member} Account not older than ${kicktime} day(s) (${pm(age, { verbose: true })})`);
+//     console.log(`Kicked ${member.user.tag} for account age violation`)
+//     infochannel.send(`Kicked ${member} for account age violation (${pm(age, { verbose: true })})`)
+// } else if (Date.now() - member.user.createdAt < 1000 * 60 * 60 * 24 * kicktime && kickenabled == false) {
+//     console.log(`${member.user.tag} joined with an account younger than ${kicktime} day(s). Kicking is disabled`)
+// }
+
 client.on("ready", () => {
     console.log(`Logged in as ${client.user.tag}!`)
     
@@ -88,17 +100,6 @@ client.on("guildMemberAdd", member => {
         infochannel.send(embed)
     } else {
         console.log("Member joined but info is disabled.")
-    }
-    if (Date.now() - member.user.createdAt < 1000*60*60*24*kicktime && kickenabled == true) {
-        const kickmsgchannel = member.guild.channels.cache.find(ch => ch.name === kickchannel);
-        const infochannel = member.guild.channels.cache.find(ch => ch.name === messagechannel);
-        let age = Date.now() - member.user.createdTimestamp;
-        member.user.send(`You have been kicked from ${message.member.guild.name}. Reason: Account too young. (${pm(age, { verbose: true })}). If you are a legitimate user come back when your account is at least ${kicktime} day(s) old.`);
-        kickmsgchannel.send(`.kick ${member} Account not older than ${kicktime} day(s) (${pm(age, { verbose: true })})`);
-        console.log(`Kicked ${member.user.tag} for account age violation`)
-        infochannel.send(`Kicked ${member} for account age violation (${pm(age, { verbose: true })})`)
-    } else if (Date.now() - member.user.createdAt < 1000 * 60 * 60 * 24 * kicktime && kickenabled == false) {
-        console.log(`${member.user.tag} joined with an account younger than ${kicktime} day(s). Kicking is disabled`)
     }
 });
 
