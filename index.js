@@ -81,6 +81,10 @@ client.on("message", message => {
 
 client.on("guildMemberAdd", member => {
     console.log(member.user.tag + " just joined the server @ " + member.joinedAt)
+    function kickfunc() {
+        const kickch = member.guild.channels.cache.find(ch => ch.name === kickchannel);
+        kickch.send(`.kick ${member} Account age under ${kicktime} day(s). Come back when your account is older then ${kicktime} day(s).`)
+    }
     if (infoenabled == true) {
         const infochannel = member.guild.channels.cache.find(ch => ch.name === messagechannel);
         let now = Date.now();
@@ -100,6 +104,16 @@ client.on("guildMemberAdd", member => {
         infochannel.send(embed)
     } else {
         console.log("Member joined but info is disabled.")
+    }
+    if (Date.now() - member.user.createdAt < 1000 * 60 * 60 * 24 * kicktime && kickenabled == true) {
+        setTimeout(kickfunc, 5000);
+        /* async function purge() {
+            const fetched = await kickch.fetchMessages({limit: 2});
+            console.log(`${fetched.size} messages found`);
+            message.channel.bulkDelete (fetched)
+                .catch(error => kickch.send(`Error: ${error}`));
+        }
+        setTimeout(purge(), 7000); */
     }
 });
 
