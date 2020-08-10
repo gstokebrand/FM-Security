@@ -18,7 +18,8 @@ function kickFunc(member, agems) {
     return;
 }
 function noPerms(msg, cmd){
-    msg.reply(`You do not have permissions to use ${cmd}`);
+    msg.reply(`You do not have permissions to use "${cmd}"`);
+    console.log(`${msg.author.tag} tried using "${cmd}" but had insufficient permissions.`)
     return;
 }
 function embed(member, age, ch) {
@@ -49,7 +50,7 @@ client.on('message', message => {
     if (command === 'kicktime') {
         if (message.member.roles.cache.some(role => role.name === modRoleName)) {
             if (!args.length) {
-                message.reply(`Current minimum account age is: ${kicktime} day(s).`)
+                message.reply(`current minimum account age is: ${kicktime} day(s).`)
             } else {
                 kicktime = args[0];
                 console.log(`Minimum account age has been set to: ${kicktime} day(s).`);
