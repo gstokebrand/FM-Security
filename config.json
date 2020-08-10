@@ -4,5 +4,6 @@
     "modRoleName": "Moderator",
     "defaultKickTime": 1,
     "embedColorHex": "#9d4d27",
+    "embedColorHexBot": "#42eff5",
     "token": ""
 }

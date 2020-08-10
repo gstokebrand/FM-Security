@@ -7,6 +7,7 @@ const {
     modRoleName,
     defaultKickTime,
     embedColorHex,
+    embedColorHexBot,
     token,
 } = require('./config.json');
 var kicktime = defaultKickTime;
@@ -28,6 +29,22 @@ function embed(member, age, ch) {
         .setTitle(member.user.tag)
         .setAuthor('FM Security', "https://media.discordapp.net/attachments/680182797339590659/729615114164240384/Factorio_Mods.png?width=677&height=677")
         .setThumbnail(member.user.displayAvatarURL({dynamic: true}))
+        .addFields(
+            { name: 'Account age', value: `${pm(age, { verbose: true })}` },
+            { name: 'ID', value: member.user.id },
+        )
+        .setTimestamp()
+        .setFooter('Automated message from FM Security');
+    ch.send(embed);
+    return;
+}
+function embedBot(member, age, ch) {
+    const embed = new Discord.MessageEmbed()
+        .setColor(embedColorHexBot)
+        .setTitle(member.user.tag)
+        .setAuthor('FM Security', "https://media.discordapp.net/attachments/680182797339590659/729615114164240384/Factorio_Mods.png?width=677&height=677")
+        .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
+        .setDescription('**BOT**')
         .addFields(
             { name: 'Account age', value: `${pm(age, { verbose: true })}` },
             { name: 'ID', value: member.user.id },
@@ -101,12 +118,15 @@ client.on('message', message => {
 });
 
 client.on('guildMemberAdd', member => {
-    if (member.user.bot) return console.log(`${member.joinedAt} -==- ${member.user.tag} joined but is a bot.`);
     if (!infoenabled) return console.log(`${member.joinedAt} -==- ${member.user.tag} joined but info is disabled.`);
     console.log(`${member.joinedAt} -==- ${member.user.tag} joined the server.`);
     const joinmsgch = member.guild.channels.cache.find(ch => ch.name === joinAgeChannel);
     const age = Date.now() - member.user.createdTimestamp;
-    embed(member, age, joinmsgch);
+    if (member.user.bot) {
+        embedBot(member, age, joinmsgch);
+    } else {
+        embed(member, age, joinmsgch);
+    }
     if (age < 1000 * 60 * 60 * 24 * kicktime){
         kickFunc(member, age);
         joinmsgch.send(`${member.user.tag} has been kicked.`);
