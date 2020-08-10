@@ -101,7 +101,7 @@ client.on('message', message => {
 });
 
 client.on('guildMemberAdd', member => {
-    if (!member.user.bot) return console.log(`${member.joinedAt} -==- ${member.user.tag} joined but is a bot.`);
+    if (member.user.bot) return console.log(`${member.joinedAt} -==- ${member.user.tag} joined but is a bot.`);
     if (!infoenabled) return console.log(`${member.joinedAt} -==- ${member.user.tag} joined but info is disabled.`);
     console.log(`${member.joinedAt} -==- ${member.user.tag} joined the server.`);
     const joinmsgch = member.guild.channels.cache.find(ch => ch.name === joinAgeChannel);
