@@ -27,7 +27,7 @@ function embed(member, age, ch) {
         .setColor(embedColorHex)
         .setTitle(member.user.tag)
         .setAuthor('FM Security', "https://media.discordapp.net/attachments/680182797339590659/729615114164240384/Factorio_Mods.png?width=677&height=677")
-        .setThumbnail(member.user.displayAvatarURL())
+        .setThumbnail(member.user.displayAvatarURL({dynamic: true}))
         .addFields(
             { name: 'Account age', value: `${pm(age, { verbose: true })}` },
             { name: 'ID', value: member.user.id },
