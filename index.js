@@ -1,120 +1,115 @@
 const Discord = require('discord.js');
 const pm = require('pretty-ms');
-const botConfig = require("./botConfig.json");
 const client = new Discord.Client();
-
-const modrole = botConfig.togglerole;
-const messagechannel = botConfig.channel;
-const kickchannel = botConfig.kickchannel;
-var kicktime = botConfig.defaultkicktime;
+const {
+    prefix,
+    joinAgeChannel,
+    modRoleName,
+    defaultKickTime,
+    embedColorHex,
+    token,
+} = require('./config.json');
+var kicktime = defaultKickTime;
 var infoenabled = true;
-var kickenabled = true;
 
-// if (Date.now() - member.user.createdAt < 1000 * 60 * 60 * 24 * kicktime && kickenabled == true) {
-//     const kickmsgchannel = member.guild.channels.cache.find(ch => ch.name === kickchannel);
-//     const infochannel = member.guild.channels.cache.find(ch => ch.name === messagechannel);
-//     let age = Date.now() - member.user.createdTimestamp;
-//     member.user.send(`You have been kicked from ${message.member.guild.name}. Reason: Account too young. (${pm(age, { verbose: true })}). If you are a legitimate user come back when your account is at least ${kicktime} day(s) old.`);
-//     kickmsgchannel.send(`.kick ${member} Account not older than ${kicktime} day(s) (${pm(age, { verbose: true })})`);
-//     console.log(`Kicked ${member.user.tag} for account age violation`)
-//     infochannel.send(`Kicked ${member} for account age violation (${pm(age, { verbose: true })})`)
-// } else if (Date.now() - member.user.createdAt < 1000 * 60 * 60 * 24 * kicktime && kickenabled == false) {
-//     console.log(`${member.user.tag} joined with an account younger than ${kicktime} day(s). Kicking is disabled`)
-// }
-
-client.on("ready", () => {
-    console.log(`Logged in as ${client.user.tag}!`)
-    
-});
-
-client.on("message", message => {
-    if (message.content.startsWith(botConfig.prefix)) {
-        console.log(message.author.tag + " called " + message.content + " @ " + message.createdAt)
-        var cmd = message.content.substr(1)
-        if (cmd.startsWith("myinfo")) {
-            let infochannel = message.channel
-            let now = Date.now();
-            let createdAt = message.author.createdTimestamp;
-            let age = now - createdAt;
-            const embed = new Discord.MessageEmbed()
-            .setColor('#9d4d27')
-            .setTitle(message.author.tag)
-            .setAuthor('FM Security', "https://media.discordapp.net/attachments/680182797339590659/729615114164240384/Factorio_Mods.png?width=677&height=677")
-            .setThumbnail(message.author.displayAvatarURL())
-            .addFields(
-                { name: 'Account age', value: `${pm(age, {verbose: true})}` },
-                { name: 'ID', value: message.author.id},
-            )
-            .setTimestamp()
-            .setFooter('Automated message from FM Security');
-            infochannel.send(embed)
-        }
-        if (cmd.startsWith("help")) {
-            let infochannel = message.channel
-            const embed = new Discord.MessageEmbed()
-                .setColor('#9d4d27')
-                .setTitle("Help")
-                .setAuthor('FM Security', "https://media.discordapp.net/attachments/680182797339590659/729615114164240384/Factorio_Mods.png?width=677&height=677")
-                .addFields(
-                    { name: '%myinfo', value: "Lists information about the person that called it" },
-                    { name: '%help', value: "This command" },
-                )
-                .setTimestamp()
-                .setFooter('Automated message from FM Security');
-            infochannel.send(embed)
-        }
-        if (message.member._roles.includes(modrole)) {
-            if (cmd == "toggleinfo"){
-                infoenabled = ! infoenabled;
-                message.reply(`info on join is now: ${infoenabled}`)
-            }
-            if (cmd == "togglekick") {
-                kickenabled = ! kickenabled
-                message.reply(`kick if account age is now: ${kickenabled}`)
-            }
-            if (cmd =="kicktime") {
-                message.reply(`This command is not yet available. Kicktime = ${kicktime}`)
-            }
-        }
-    }
-});
-
-client.on("guildMemberAdd", member => {
-    console.log(member.user.tag + " just joined the server @ " + member.joinedAt)
-    function kickfunc() {
-        const kickch = member.guild.channels.cache.find(ch => ch.name === kickchannel);
-        kickch.send(`.kick ${member} Account age under ${kicktime} day(s). Come back when your account is older then ${kicktime} day(s).`)
-    }
-    if (infoenabled == true) {
-        const infochannel = member.guild.channels.cache.find(ch => ch.name === messagechannel);
-        let now = Date.now();
-        let createdAt = member.user.createdTimestamp;
-        let age = now - createdAt;
-        const embed = new Discord.MessageEmbed()
-        .setColor('#9d4d27')
+function kickFunc(member, agems) {
+    member.kick(`Recorded account age < ${kicktime} day(s). (${pm(agems, { verbose: true })})`);
+    console.log(`${member.user.tag} has been kicked for account age violation. (${pm(agems, { verbose: true })})`);
+    return;
+}
+function noPerms(msg, cmd){
+    msg.reply(`You do not have permissions to use ${cmd}`);
+    return;
+}
+function embed(member, age, ch) {
+    const embed = new Discord.MessageEmbed()
+        .setColor(embedColorHex)
         .setTitle(member.user.tag)
         .setAuthor('FM Security', "https://media.discordapp.net/attachments/680182797339590659/729615114164240384/Factorio_Mods.png?width=677&height=677")
         .setThumbnail(member.user.displayAvatarURL())
         .addFields(
-            { name: 'Account age', value: `${pm(age, {verbose: true})}` },
-            { name: 'ID', value: member.user.id},
+            { name: 'Account age', value: `${pm(age, { verbose: true })}` },
+            { name: 'ID', value: member.user.id },
         )
         .setTimestamp()
         .setFooter('Automated message from FM Security');
-        infochannel.send(embed)
-    } else {
-        console.log("Member joined but info is disabled.")
-    }
-    if (Date.now() - member.user.createdAt < 1000 * 60 * 60 * 24 * kicktime && kickenabled == true) {
-        setTimeout(kickfunc, 5000);
-        /* async function purge() {
-            const fetched = await kickch.fetchMessages({limit: 2});
-            console.log(`${fetched.size} messages found`);
-            message.channel.bulkDelete (fetched)
-                .catch(error => kickch.send(`Error: ${error}`));
+    ch.send(embed);
+    return;
+}
+
+client.on('ready', () => {
+    console.log(`Logged in as ${client.user.tag}.`)
+});
+
+client.on('message', message => {
+    if (!message.content.startsWith(prefix) || message.author.bot) return;
+    const args = message.content.slice(prefix.length).trim().split(/ +/);
+    const command = args.shift().toLowerCase();
+    console.log(`${message.createdAt} ---- ${message.author.tag} issued command: "${command}" with args: ${args}`);
+    if (command === 'kicktime') {
+        if (message.member.roles.cache.some(role => role.name === modRoleName)) {
+            if (!args.length) {
+                message.reply(`Current minimum account age is: ${kicktime} day(s).`)
+            } else {
+                kicktime = args[0];
+                console.log(`Minimum account age has been set to: ${kicktime} day(s).`);
+                message.reply(`minimum account age has been set to: ${kicktime} day(s).`);
+            }
+        } else {
+            noPerms(message, command);
         }
-        setTimeout(purge(), 7000); */
+    }
+    if (command === 'toggleinfo') {
+        if (message.member.roles.cache.some(role => role.name === modRoleName)) {
+            infoenabled = ! infoenabled;
+            message.reply(`info on join is now: ${infoenabled}.`);
+            console.log(`Info on join is now: ${infoenabled}.`);
+        } else {
+            noPerms(message, command);
+        }
+    }
+    if (command === 'info') {
+        if (!args.length) {
+            const age = Date.now() - message.author.createdTimestamp;
+            embed(message.member, age, message.channel);
+        } else {
+            const taggedUser = message.mentions.users.first();
+            if (taggedUser) {
+                const taggedMember = message.guild.member(taggedUser);
+                const age = Date.now() - taggedUser.createdTimestamp;
+                embed(taggedMember, age, message.channel)
+            } else {
+                message.reply('no valid user was mentioned.')
+            }
+        }
+    }
+    if (command === 'help') {
+        let infochannel = message.channel
+        const embed = new Discord.MessageEmbed()
+            .setColor(embedColorHex)
+            .setTitle("Help")
+            .setAuthor('FM Security', "https://media.discordapp.net/attachments/680182797339590659/729615114164240384/Factorio_Mods.png?width=677&height=677")
+            .addFields(
+                { name: `${prefix}info`, value: "Lists information about users. Usage: ```info [member]```If no member is given it will default to the author of the message." },
+                { name: `${prefix}help`, value: "This command" },
+            )
+            .setTimestamp()
+            .setFooter('Automated message from FM Security');
+        infochannel.send(embed)
     }
 });
 
-client.login(process.env.token);
+client.on('guildMemberAdd', member => {
+    if (!member.user.bot) return console.log(`${member.joinedAt} -==- ${member.user.tag} joined but is a bot.`);
+    if (!infoenabled) return console.log(`${member.joinedAt} -==- ${member.user.tag} joined but info is disabled.`);
+    console.log(`${member.joinedAt} -==- ${member.user.tag} joined the server.`);
+    const joinmsgch = member.guild.channels.cache.find(ch => ch.name === joinAgeChannel);
+    const age = Date.now() - member.user.createdTimestamp;
+    embed(member, age, joinmsgch);
+    if (age < 1000 * 60 * 60 * 24 * kicktime){
+        kickFunc(member, age);
+        joinmsgch.send(`${member.user.tag} has been kicked.`);
+    }
+});
+
+client.login(token);

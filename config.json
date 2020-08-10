@@ -1,0 +1,8 @@
+{
+    "prefix": "%",
+    "joinAgeChannel": "account-checking-channel",
+    "modRoleName": "Moderator",
+    "defaultKickTime": 1,
+    "embedColorHex": "#9d4d27",
+    "token": ""
+}
