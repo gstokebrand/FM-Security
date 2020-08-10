@@ -13,9 +13,34 @@ const {
 var kicktime = defaultKickTime;
 var infoenabled = true;
 
-function kickFunc(member, agems) {
-    member.kick(`Recorded account age < ${kicktime} day(s). (${pm(agems, { verbose: true })})`);
-    console.log(`${member.user.tag} has been kicked for account age violation. (${pm(agems, { verbose: true })})`);
+async function kickFunc(member, agems, ch) {
+    member
+        .createDM()
+        .then((DMChannel) => {
+            DMChannel
+                .send(`You have been kicked from ${member.guild.name}. Reason: Account age < ${kicktime} day(s). (${pm(agems, { verbose: true })})`)
+                .then(() => {
+                    console.log(`DM has been sent to ${member.user.tag}`);
+                    member
+                        .kick(`Recorded account age < ${kicktime} day(s). (${pm(agems, { verbose: true })})`)
+                        .then(() => {
+                            console.log(`${member.user.tag} has been kicked for account age violation. (${pm(agems, { verbose: true })})`);
+                            ch.send(`${member.user.tag} has been kicked.`);
+                        })
+                        .catch((e) => {
+                            console.log('Failed to kick!', e);
+                        });
+                }); 
+        })
+        .catch(() => {
+            console.log(`${member.user.tag} has dm's closed or is a bot.`);
+            member
+                .kick(`Recorded account age < ${kicktime} day(s). (${pm(agems, { verbose: true })})`)
+                .then (() => {
+                    console.log(`${member.user.tag} has been kicked for account age violation. (${pm(agems, { verbose: true })})`);
+                    ch.send(`${member.user.tag} has been kicked.`);
+                })
+        });
     return;
 }
 function noPerms(msg, cmd){
@@ -121,6 +146,7 @@ client.on('guildMemberAdd', member => {
     if (!infoenabled) return console.log(`${member.joinedAt} -==- ${member.user.tag} joined but info is disabled.`);
     console.log(`${member.joinedAt} -==- ${member.user.tag} joined the server.`);
     const joinmsgch = member.guild.channels.cache.find(ch => ch.name === joinAgeChannel);
+    if (!joinmsgch) return console.log('joinAgeChannel configured incorrectly!');
     const age = Date.now() - member.user.createdTimestamp;
     if (member.user.bot) {
         embedBot(member, age, joinmsgch);
@@ -128,8 +154,8 @@ client.on('guildMemberAdd', member => {
         embed(member, age, joinmsgch);
     }
     if (age < 1000 * 60 * 60 * 24 * kicktime){
-        kickFunc(member, age);
-        joinmsgch.send(`${member.user.tag} has been kicked.`);
+        kickFunc(member, age, joinmsgch);
+        /*joinmsgch.send(`${member.user.tag} has been kicked.`);*/
     }
 });
 
