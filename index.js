@@ -43,6 +43,21 @@ async function kickFunc(member, agems, ch) {
         });
     return;
 }
+async function presence() {
+    client.user
+        .setStatus('online')
+        .then(() => {
+            client.user
+                .setActivity('Factorio Mods', {type: 'WATCHING'})
+                .then(console.log('Presence updated!'))
+                .catch((err) => {
+                    console.log(err);
+                });
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+}
 function noPerms(msg, cmd){
     msg.reply(`You do not have permissions to use "${cmd}"`);
     console.log(`${msg.author.tag} tried using "${cmd}" but had insufficient permissions.`)
@@ -82,6 +97,7 @@ function embedBot(member, age, ch) {
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}.`)
+    presence();
 });
 
 client.on('message', message => {
