@@ -56,6 +56,7 @@ async function kickFunc(member, agems, ch) {
     return;
 }
 async function presence() {
+    //set presence
     client.user
         .setStatus('online')
         .then(() => {
@@ -114,9 +115,10 @@ client.on('ready', () => {
 
 client.on('message', message => {
     if (!message.content.startsWith(prefix) || message.author.bot) return;
+    //command/args slicer
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
-    console.log(`${message.createdAt} ---- ${message.author.tag} issued command: "${command}" with args: ${args}`);
+    console.log(`${message.author.tag} issued command: "${command}" with args: ${args}`);
     if (command === 'kicktime') {
         if (message.member.roles.cache.some(role => role.name === modRoleName)) {
             if (!args.length) {
@@ -170,9 +172,10 @@ client.on('message', message => {
     }
 });
 
+//on user join
 client.on('guildMemberAdd', member => {
-    if (!infoenabled) return console.log(`${member.joinedAt} -==- ${member.user.tag} joined but info is disabled.`);
-    console.log(`${member.joinedAt} -==- ${member.user.tag} joined the server.`);
+    if (!infoenabled) return console.log(`${member.user.tag} joined but info is disabled.`);
+    console.log(`${member.user.tag} joined the server.`);
     const joinmsgch = member.guild.channels.cache.find(ch => ch.name === joinAgeChannel);
     if (!joinmsgch) return console.log('joinAgeChannel configured incorrectly!');
     const age = Date.now() - member.user.createdTimestamp;
@@ -181,9 +184,9 @@ client.on('guildMemberAdd', member => {
     } else {
         embed(member, age, joinmsgch);
     }
+    //check if account age < kicktime
     if (age < 1000 * 60 * 60 * 24 * kicktime){
         kickFunc(member, age, joinmsgch);
-        /*joinmsgch.send(`${member.user.tag} has been kicked.`);*/
     }
 });
 
