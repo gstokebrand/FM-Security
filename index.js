@@ -20,6 +20,7 @@ async function kickFunc(member, agems, ch) {
             DMChannel
                 .send(`You have been kicked from ${member.guild.name}. Reason: Account age < ${kicktime} day(s). (${pm(agems, { verbose: true })})`)
                 .then(() => {
+                    ch.send(`DM has been sent to ${member.user.tag}`);
                     console.log(`DM has been sent to ${member.user.tag}`);
                     member
                         .kick(`Recorded account age < ${kicktime} day(s). (${pm(agems, { verbose: true })})`)
@@ -27,18 +28,29 @@ async function kickFunc(member, agems, ch) {
                             console.log(`${member.user.tag} has been kicked for account age violation. (${pm(agems, { verbose: true })})`);
                             ch.send(`${member.user.tag} has been kicked.`);
                         })
-                        .catch((e) => {
-                            console.log('Failed to kick!', e);
+                        .catch((err) => {
+                            ch.send('Failed to kick, check logs');
+                            console.log('Failed to kick!', err);
                         });
-                }); 
+                }) 
+                .catch(() => {
+                    ch.send(`Could not send DM to ${member.user.tag}.`);
+                    console.log(`Could not send DM to ${member.user.tag}.`);
+                });
         })
         .catch(() => {
+            ch.send(`DMChannel could not be created, kicking anyway...`);
             console.log(`${member.user.tag} has dm's closed or is a bot.`);
             member
                 .kick(`Recorded account age < ${kicktime} day(s). (${pm(agems, { verbose: true })})`)
                 .then (() => {
                     console.log(`${member.user.tag} has been kicked for account age violation. (${pm(agems, { verbose: true })})`);
                     ch.send(`${member.user.tag} has been kicked.`);
+                })
+                .catch((err) => {
+                    ch.send('Failed to kick, check logs');
+                    console.log('Failed to kick!', err);
+                    
                 })
         });
     return;
