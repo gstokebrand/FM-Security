@@ -4,6 +4,7 @@ const client = new Discord.Client();
 const {
     prefix,
     joinAgeChannel,
+    leaveChannel,
     modRoleName,
     defaultKickTime,
     embedColorHex,
@@ -13,7 +14,7 @@ const {
 var kicktime = defaultKickTime;
 var infoenabled = true;
 
-async function kickFunc(member, agems, ch) {
+async function kickFunc(member, agems, ch, leavech) {
     member
         .createDM()
         .then((DMChannel) => {
@@ -26,6 +27,7 @@ async function kickFunc(member, agems, ch) {
                         .kick(`Recorded account age < ${kicktime} day(s). (${pm(agems, { verbose: true })})`)
                         .then(() => {
                             console.log(`${member.user.tag} has been kicked for account age violation. (${pm(agems, { verbose: true })})`);
+                            leavech.send(`User ${member.user.username} has been kicked for account age violation.`);
                             ch.send(`${member.user.tag} has been kicked.`);
                         })
                         .catch((err) => {
@@ -45,6 +47,7 @@ async function kickFunc(member, agems, ch) {
                 .kick(`Recorded account age < ${kicktime} day(s). (${pm(agems, { verbose: true })})`)
                 .then (() => {
                     console.log(`${member.user.tag} has been kicked for account age violation. (${pm(agems, { verbose: true })})`);
+                    leavech.send(`User ${member.user.username} has been kicked for account age violation.`);
                     ch.send(`${member.user.tag} has been kicked.`);
                 })
                 .catch((err) => {
@@ -186,8 +189,11 @@ client.on('guildMemberAdd', member => {
     }
     //check if account age < kicktime
     if (age < 1000 * 60 * 60 * 24 * kicktime){
-        kickFunc(member, age, joinmsgch);
+        const leavemsgch = member.guild.channels.cache.find(ch => ch.name === leaveChannel);
+        if (!leavemsgch) return console.log(`${leaveChannel} is not found in guild.`);
+        kickFunc(member, age, joinmsgch, leavemsgch);
     }
 });
-
+// 729641255805517945
+// 670680248198627356
 client.login(token);
