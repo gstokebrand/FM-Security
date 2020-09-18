@@ -1,7 +1,7 @@
 {
     "prefix": "%",
     "joinAgeChannel": "account-checking-channel",
-    "leaveChannel": "🚪-leave",
+    "leaveChannel": "🚪-new-people-shrine",
     "modRoleName": "Moderator",
     "defaultKickTime": 1,
     "embedColorHex": "#9d4d27",
