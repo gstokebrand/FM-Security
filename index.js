@@ -58,13 +58,13 @@ async function kickFunc(member, agems, ch, leavech) {
         });
     return;
 }
-async function presence() {
+async function presence(activity, type) {
     //set presence
     client.user
         .setStatus('online')
         .then(() => {
             client.user
-                .setActivity('Factorio Mods', {type: 'WATCHING'})
+                .setActivity(activity, {type: type})
                 .then(console.log('Presence updated!'))
                 .catch((err) => {
                     console.log(err);
@@ -112,8 +112,8 @@ function embedBot(member, age, ch) {
 }
 
 client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}.`)
-    presence();
+    console.log(`Logged in as ${client.user.tag}.`);
+    presence(`${client.users.cache.size} members`, 'WATCHING');
 });
 
 client.on('message', message => {
@@ -177,6 +177,7 @@ client.on('message', message => {
 
 //on user join
 client.on('guildMemberAdd', member => {
+    presence(`${member.guild.memberCount} members`, 'WATCHING');
     if (!infoenabled) return console.log(`${member.user.tag} joined but info is disabled.`);
     console.log(`${member.user.tag} joined the server.`);
     const joinmsgch = member.guild.channels.cache.find(ch => ch.name === joinAgeChannel);
@@ -193,6 +194,10 @@ client.on('guildMemberAdd', member => {
         if (!leavemsgch) return console.log(`${leaveChannel} is not found in guild.`);
         kickFunc(member, age, joinmsgch, leavemsgch);
     }
+});
+
+client.on('guildMemberRemove', member => {
+    presence(`${member.guild.memberCount} members`, 'WATCHING');
 });
 // 729641255805517945
 // 670680248198627356
