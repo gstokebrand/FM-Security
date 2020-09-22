@@ -5,7 +5,7 @@ const {
     prefix,
     joinAgeChannel,
     leaveChannel,
-    modRoleName,
+    roleIDs,
     defaultKickTime,
     embedColorHex,
     embedColorHexBot,
@@ -79,6 +79,15 @@ function noPerms(msg, cmd){
     console.log(`${msg.author.tag} tried using "${cmd}" but had insufficient permissions.`)
     return;
 }
+function auth(msg){
+    for (i = 0; i < roleIDs.length; i++) {
+        if (msg.member.roles.cache.has(roleIDs[i])) {
+            // console.log(`${msg.author.tag} has permission!`)
+            return true;
+        }
+    } 
+    return false;
+}
 function embed(member, age, ch) {
     const embed = new Discord.MessageEmbed()
         .setColor(embedColorHex)
@@ -121,9 +130,11 @@ client.on('message', message => {
     //command/args slicer
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
+    const authorized = auth(message);
+    // console.log(authorized);
     console.log(`${message.author.tag} issued command: "${command}" with args: ${args}`);
     if (command === 'kicktime') {
-        if (message.member.roles.cache.some(role => role.name === modRoleName)) {
+        if (authorized) {
             if (!args.length) {
                 message.reply(`current minimum account age is: ${kicktime} day(s).`)
             } else {
@@ -136,7 +147,7 @@ client.on('message', message => {
         }
     }
     if (command === 'toggleinfo') {
-        if (message.member.roles.cache.some(role => role.name === modRoleName)) {
+        if (authorized) {
             infoenabled = ! infoenabled;
             message.reply(`info on join is now: ${infoenabled}.`);
             console.log(`Info on join is now: ${infoenabled}.`);
